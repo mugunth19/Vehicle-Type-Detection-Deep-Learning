@@ -1,154 +1,233 @@
-# Vehicle Type Classification Project (MobileNetV2 - ONNX Export)
+# Vehicle Type Classification with Deep Learning
 
-## Overview
-This project aims to develop a vehicle type classification model capable of distinguishing between `hatchback`, `motorcycle`, `pickup`, `sedan`, and `suv` vehicles. The solution utilizes a pre-trained MobileNetV2 backbone, fine-tuned on a custom dataset, and then exported to ONNX format for efficient and portable inference.
+## Project Introduction
+
+This project implements an end-to-end vehicle type classification system using deep learning. The system can automatically identify and classify vehicles into five categories: **hatchback**, **motorcycle**, **pickup**, **sedan**, and **suv** from images.
+
+### Key Features
+- **High Accuracy**: Achieves 89.9% validation accuracy using MobileNetV2 architecture
+- **Production Ready**: Containerized FastAPI service deployed on AWS ECS
+- **Efficient Inference**: ONNX model format for optimized performance (<100ms per image)
+- **Real-world Application**: Handles class imbalance and various image conditions
+
+### Use Cases
+- **Traffic Management**: Automated vehicle counting and classification
+- **Parking Systems**: Smart parking allocation based on vehicle type
+- **Insurance**: Automated vehicle type verification for claims
+- **Fleet Management**: Vehicle inventory and monitoring systems
+- **Security**: Access control based on vehicle classification
 
 ## Project Structure
 
-- `vehicle-type/`: Original dataset directory after unzipping.
-- `vehicle_data_split/`: Dataset split into `train`, `val`, and `test` directories.
-- `vehicleclassifier_WDA_32_0.899.pth`: Best performing PyTorch model checkpoint.
-- `vehicle_identifier_mobilenet_v2.onnx`: The final model exported in ONNX format.
-
-## Dataset
-
-The dataset consists of images of various vehicle types. It was obtained from a ZIP file (`r7bthvstxw-2.zip`), unzipped, and renamed to `vehicle-type/`. The dataset contains the following classes:
-
-- `hatchback`
-- `motorcycle`
-- `pickup`
-- `sedan`
-- `suv`
-
-### Class Distribution
-The initial analysis revealed an imbalance in the class distribution. For instance, 'pickup' and 'sedan' classes have significantly more samples than 'motorcycle' or 'suv'. To address this, a **weighted cross-entropy loss function** was employed during training.
-
-| Vehicle Class | Number of Samples |
-|---------------|-------------------|
-| hatchback     | 181               |
-| motorcycle    | 122               |
-| pickup        | 478               |
-| sedan         | 400               |
-| suv           | 129               |
-
-## Data Preparation and Augmentation
-
-### Custom Dataset Class
-A `VehicleDataset` class was implemented to efficiently load images and their corresponding labels from disk. It handles reading image files, converting them to RGB, and applying transformations.
-
-### Data Splitting
-The dataset was split into training, validation, and test sets using a ratio of 80% for training, 10% for validation, and 10% for testing. This ensures a robust evaluation of the model's performance on unseen data.
-
-### Transformations
-To enhance model generalization and prevent overfitting, extensive data augmentation was applied to the training set:
-
--   **Random Horizontal Flip**: Flips images horizontally with a 50% probability, as the orientation of a vehicle does not change its type.
--   **Random Rotation**: Rotates images by up to 15 degrees, useful for real-world scenarios where camera angles might vary.
--   **Color Jitter**: Adjusts brightness, contrast, and saturation (each by 20%), helping the model become robust to different lighting conditions and vehicle colors.
--   **Random Resized Crop**: Crops a random portion of the image and resizes it to the target `input_size`, simulating varying distances and perspectives of vehicles.
-
-The validation set only underwent resizing and normalization.
-
-## Model Architecture
-
-The model is based on the **MobileNetV2** architecture, pre-trained on ImageNet. The pre-trained weights are frozen to leverage learned features, and a custom head is added for classification:
-
--   **Base Model**: `mobilenet_v2` (features frozen).
--   **Global Average Pooling**: `nn.AdaptiveAvgPool2d((1, 1))` to reduce spatial dimensions.
--   **Dropout Layer**: `nn.Dropout(p=0.2)` applied to the flattened features to reduce overfitting.
--   **Output Layer**: `nn.Linear(1280, 5)` to classify into the 5 vehicle types.
-
-## Training Details
-
--   **Loss Function**: `nn.CrossEntropyLoss` with class weights to counteract dataset imbalance.
--   **Optimizer**: Adam optimizer.
--   **Learning Rate**: 0.01 (selected after hyperparameter tuning).
--   **Dropout Probability**: 0.2 (selected after hyperparameter tuning).
--   **Epochs**: 50.
--   **Device**: Training performed on GPU if available, otherwise CPU.
-
-## Hyperparameter Tuning
-
-Initial experiments were conducted to determine optimal hyperparameters:
-
-1.  **Learning Rate**: Tested `0.001`, `0.01`, `0.1`. A learning rate of `0.01` yielded the best performance (Validation Accuracy of 93.80% in one run, but with significant loss fluctuations).
-2.  **Inner Layer Size**: Experimented with adding a new inner linear layer (sizes `100, 250, 500, 750, 1000`). This did not improve performance; in fact, it led to much higher loss and lower accuracy, indicating that the original simple head was sufficient.
-3.  **Dropout**: Tested dropout probabilities `0.2`, `0.4`, `0.5`, `0.7`. A dropout of `0.2` produced the most stable and highest validation accuracy with data augmentation.
-
-The chosen configuration (LR=0.01, Dropout=0.2, no inner layer, with data augmentation) provided the best balance between training performance and generalization.
-
-## Performance
-
-The final model, trained with data augmentation, a learning rate of 0.01, and a dropout of 0.2, achieved a **validation accuracy of 89.9%** (checkpoint saved at epoch 32). While a non-augmented model occasionally showed slightly higher peak accuracy (e.g., 92%), the augmented model demonstrated superior generalization capabilities and more consistent performance across epochs due to its exposure to a wider variety of image transformations.
-
-## ONNX Export
-
-To facilitate deployment and efficient inference in various environments, the trained PyTorch model was exported to the ONNX (Open Neural Network Exchange) format. The ONNX model preserves the architecture and weights, allowing it to be run with ONNX Runtime or other ONNX-compatible engines.
-
--   **ONNX Model File**: `vehicle_identifier_mobilenet_v2.onnx`
-
-## How to Use the ONNX Model (Python Example for Inference)
-
-### 1. Install ONNX Runtime
-```bash
-pip install onnxruntime
+```
+Vehicle-Type-Detection-Deep-Learning/
+├── model_file/
+│   ├── vehicle_identifier_mobilenet_v2.onnx     # ONNX model for inference
+│   ├── vehicle_identifier_mobilenet_v2.onnx.data # External model data
+│   └── vehicleclassifier_WDA_32_0.899.pth       # PyTorch checkpoint
+├── scripts/
+│   ├── train.py          # Training pipeline
+│   ├── predict.py        # FastAPI prediction server
+│   ├── test_local.py     # Local testing script
+│   └── test_cloud.py     # Cloud deployment testing
+├── test_images/          # Sample images for testing
+├── Dockerfile           # Container configuration
+├── requirements.txt     # Python dependencies
+└── Pipfile             # Pipenv configuration
 ```
 
-### 2. Load and Run Inference
+## Dataset Details
+
+### Data Source & Citation
+The dataset is sourced from Mendeley Data:
+
+**Citation**: Boonsirisumpun, Narong; Surinta, Olarik (2021), "Vehicle Type Image Dataset (Version 1): VTID1", Mendeley Data, V1, doi: 10.17632/r7bthvstxw.1
+
+- **Dataset URL**: https://data.mendeley.com/datasets/r7bthvstxw/1
+- **Download URL**: https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/r7bthvstxw-2.zip
+- **Total Images**: 1,310 vehicle images
+- **Format**: RGB images in various resolutions
+- **Classes**: 5 vehicle types (hatchback, motorcycle, pickup, sedan, suv)
+- **Data Acquisition**: Automatically downloaded and processed by training script
+
+### Class Distribution & Imbalance Handling
+The dataset exhibits significant class imbalance, addressed using weighted cross-entropy loss:
+
+| Vehicle Class | Samples | Percentage | Weight Applied |
+|---------------|---------|------------|----------------|
+| Pickup        | 478     | 36.5%      | 0.55           |
+| Sedan         | 400     | 30.5%      | 0.65           |
+| Hatchback     | 181     | 13.8%      | 1.44           |
+| SUV           | 129     | 9.8%       | 2.02           |
+| Motorcycle    | 122     | 9.3%       | 2.14           |
+
+## Model Architecture & Training
+
+### Architecture
+MobileNetV2-based transfer learning approach:
+
+```
+MobileNetV2 (ImageNet pretrained, frozen)
+    ↓
+Global Average Pooling (1x1)
+    ↓
+Dropout (p=0.2)
+    ↓
+Linear Classifier (1280 → 5 classes)
+```
+
+### Training Configuration
+- **Loss Function**: Weighted CrossEntropyLoss (addresses class imbalance)
+- **Optimizer**: Adam (lr=0.01)
+- **Batch Size**: 32
+- **Input Size**: 224×224 RGB images
+- **Data Split**: 80% train, 10% validation, 10% test
+
+### Data Augmentation
+- Random Horizontal Flip (50% probability)
+- Random Rotation (±15 degrees)
+- Color Jitter (brightness, contrast, saturation ±20%)
+- Random Resized Crop (scale 0.8-1.0)
+- ImageNet normalization
+
+### Performance Results
+- **Validation Accuracy**: 89.9%
+- **Model Size**: 14MB (ONNX format)
+- **Inference Speed**: <100ms per image on CPU
+
+## Deployment Architecture
+
+### AWS ECS Deployment
+- **Service**: FastAPI REST API server
+- **Container**: Docker with Python 3.12 slim base
+- **Load Balancer**: Application Load Balancer
+- **Endpoint**: `http://vehicle-type-identifier-880645094.ap-south-1.elb.amazonaws.com`
+- **Auto-scaling**: Based on CPU/memory usage
+
+### API Endpoints
+- **POST /predict**: Upload image for vehicle classification
+- **GET /health**: Service health check
+
+## Quick Start
+
+### Prerequisites
+- Python 3.10+ or Docker
+- Pre-trained model files included in repository
+
+### Local Setup
+```bash
+git clone <repository-url>
+cd Vehicle-Type-Detection-Deep-Learning
+
+# Install dependencies
+pipenv install && pipenv shell
+# OR
+pip install -r requirements.txt
+
+# Run prediction server
+python scripts/predict.py
+# Server runs on http://localhost:8000
+
+# Test with sample images
+python scripts/test_local.py
+```
+
+### Docker Deployment
+```bash
+docker build -t vehicle-classifier .
+docker run -p 8000:8000 vehicle-classifier
+```
+
+### Cloud Testing
+```bash
+# Test live AWS ECS service
+python scripts/test_cloud.py "https://example.com/car-image.jpg"
+```
+
+## API Usage
+
+### cURL Example
+```bash
+curl -X POST "http://localhost:8000/predict" \
+     -H "Content-Type: multipart/form-data" \
+     -F "file=@test_images/car.jpg"
+```
+
+### Python Example
 ```python
-import onnxruntime as ort
-import numpy as np
-from PIL import Image
-from torchvision import transforms
+import requests
 
-# Define the path to your ONNX model
-onnx_model_path = "vehicle_identifier_mobilenet_v2.onnx"
+with open("car_image.jpg", "rb") as f:
+    response = requests.post("http://localhost:8000/predict", files={"file": f})
+    result = response.json()
+    print(f"Vehicle: {result['label']}, Confidence: {result['confidence']:.2f}")
+```
 
-# Load the ONNX model
-sess = ort.InferenceSession(onnx_model_path)
+### Response Format
+```json
+{
+  "label": "sedan",
+  "confidence": 0.8945,
+  "probabilities": [0.0123, 0.0234, 0.0345, 0.8945, 0.0353]
+}
+```
 
-# Get input and output names
-input_name = sess.get_inputs()[0].name
-output_name = sess.get_outputs()[0].name
+## Performance Metrics
 
-# Define preprocessing transforms (must match training transforms - specifically validation transforms)
-input_size = 224
-mean = [0.485, 0.456, 0.406]
-std = [0.229, 0.224, 0.225]
+- **Accuracy**: 89.9% validation accuracy
+- **Inference Speed**: <100ms per image
+- **Model Size**: 14MB (ONNX)
+- **Memory Usage**: <512MB during inference
+- **Supported Formats**: JPG, PNG, WebP
+- **Input Resolution**: 224×224 (auto-resized)
 
-preprocess = transforms.Compose([
-    transforms.Resize((input_size, input_size)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=mean, std=std)
-])
+## Future Implementations
 
-# Example image path (replace with an actual image path)
-example_image_path = "path/to/your/image.jpg"
+### Model Improvements
+- **Multi-scale Training**: Implement training with multiple image scales for better generalization
+- **Advanced Architectures**: Experiment with EfficientNet, Vision Transformers (ViT)
+- **Model Ensemble**: Combine multiple models for improved accuracy
+- **Quantization**: INT8 quantization for faster mobile inference
 
-# Load and preprocess the image
-img = Image.open(example_image_path).convert('RGB')
-img_tensor = preprocess(img)
+### Feature Enhancements
+- **Real-time Video Processing**: Extend to video streams and real-time classification
+- **Multi-vehicle Detection**: Integrate with object detection (YOLO) for multiple vehicles per image
+- **Additional Classes**: Expand to more vehicle types (bus, truck, van, etc.)
+- **Confidence Thresholding**: Implement rejection for low-confidence predictions
 
-# Add a batch dimension
-input_batch = img_tensor.unsqueeze(0).numpy()
+### Deployment & Infrastructure
+- **Edge Deployment**: TensorRT optimization for NVIDIA Jetson devices
+- **Mobile Apps**: React Native/Flutter apps with on-device inference
+- **Kubernetes**: Migrate from ECS to EKS for better scalability
+- **Monitoring**: Implement MLOps pipeline with model drift detection
+- **A/B Testing**: Framework for testing different model versions
 
-# Run inference
-outputs = sess.run([output_name], {input_name: input_batch})
+### Data & Training
+- **Active Learning**: Implement active learning for continuous model improvement
+- **Synthetic Data**: Generate synthetic vehicle images for data augmentation
+- **Federated Learning**: Distributed training across multiple data sources
+- **AutoML**: Automated hyperparameter tuning and architecture search
 
-# Get the raw logits
-logits = outputs[0]
+## Troubleshooting
 
-# Apply softmax to get probabilities (optional)
-probabilities = np.exp(logits) / np.sum(np.exp(logits), axis=1, keepdims=True)
+**Common Issues**:
+- **Port 8000 in use**: Change port in `scripts/predict.py`
+- **Model file not found**: Ensure model files are in `model_file/` directory
+- **Import errors**: Install dependencies with `pip install -r requirements.txt`
+- **Memory issues**: Reduce batch size or use CPU inference
 
-# Define class labels (must match the order used during training)
-class_labels = ['hatchback', 'motorcycle', 'pickup', 'sedan', 'suv']
+## Citation
 
-# Get the predicted class index and probability
-predicted_class_idx = np.argmax(probabilities, axis=1)[0]
-predicted_class_label = class_labels[predicted_class_idx]
-confidence = probabilities[0, predicted_class_idx]
+If you use this project or dataset in your research, please cite:
 
-print(f"Predicted Vehicle Type: {predicted_class_label}")
-print(f"Confidence: {confidence:.4f}")
+```bibtex
+@data{boonsirisumpun2021vehicle,
+  author = {Boonsirisumpun, Narong and Surinta, Olarik},
+  title = {Vehicle Type Image Dataset (Version 1): VTID1},
+  year = {2021},
+  publisher = {Mendeley Data},
+  version = {V1},
+  doi = {10.17632/r7bthvstxw.1},
+  url = {https://data.mendeley.com/datasets/r7bthvstxw/1}
+}
 ```
