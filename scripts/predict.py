@@ -78,9 +78,7 @@ async def health():
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    # Validate content type
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Uploaded file must be an image")
+
 
     contents = await file.read()
     try:
