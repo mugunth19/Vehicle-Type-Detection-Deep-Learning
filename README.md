@@ -104,6 +104,8 @@ Linear Classifier (1280 → 5 classes)
 - **Endpoint**: `http://vehicle-type-identifier-880645094.ap-south-1.elb.amazonaws.com`
 - **Auto-scaling**: Based on CPU/memory usage
 
+           ![AWS Deployment](1766499772465.jpg)
+  
 ### API Endpoints
 - **POST /predict**: Upload image for vehicle classification
 - **GET /health**: Service health check
