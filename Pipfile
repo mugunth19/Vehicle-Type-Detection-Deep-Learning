@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+pillow = "*"
+onnxruntime = "*"
+fastapi = "*"
+uvicorn = "*"
+python-multipart = "*"
+
+[dev-packages]
+requests = "*"
+
+[requires]
+python_version = "3.12"
