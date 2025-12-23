@@ -143,6 +143,30 @@ docker run -p 8000:8000 vehicle-classifier
 # Test live AWS ECS service
 python scripts/test_cloud.py "https://example.com/car-image.jpg"
 ```
+Example urls:
+suv 
+
+python scripts/test_cloud.py "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+
+sedan:
+
+
+python scripts/test_cloud.py "https://images.unsplash.com/photo-1591363748916-d7f3f2df01b0?q=80&w=749&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+
+
+hatchback
+
+python scripts/test_cloud.py "https://www.shutterstock.com/shutterstock/photos/1143627347/display_1500/stock-photo-chiangmai-thailand-july-new-private-sedan-car-toyota-yaris-ativ-eco-car-photo-at-1143627347.jpg"
+
+
+pickup:
+
+python scripts/test_cloud.py "https://www.shutterstock.com/shutterstock/photos/2445345389/display_1500/stock-photo-chiangmai-thailand-september-private-pickup-truck-car-toyota-hilux-revo-on-road-no-2445345389.jpg"
+
+
+motorcycle:
+
+python scripts/test_cloud.py "https://www.shutterstock.com/shutterstock/photos/2389371229/display_1500/stock-photo-editorial-use-only-a-motorcycle-taxi-driver-wearing-an-orange-waist-coat-and-crash-helmet-taken-2389371229.jpg"
 
 ## API Usage
 
