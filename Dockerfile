@@ -4,15 +4,15 @@ FROM python:3.12-slim
 # Set working directory
 WORKDIR /app
 
-# Copy Pipfile and Pipfile.lock and install runtime dependencies via pipenv
-COPY Pipfile Pipfile.lock ./
+# Copy requirements.txt and install runtime dependencies via pip
+COPY requirements.txt ./
 
-# Install minimal system libs and Python deps, then use pipenv to install locked deps
+# Install minimal system libs and Python deps, then install from requirements file
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libglib2.0-0 libsm6 libxrender1 libxext6 build-essential \
-    && pip install --upgrade pip pipenv \
-    && pipenv install --deploy --system --ignore-pipfile \
+    && pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Copy only the server script and the ONNX model (keep the image small)
 COPY scripts/predict.py /app/scripts/predict.py
