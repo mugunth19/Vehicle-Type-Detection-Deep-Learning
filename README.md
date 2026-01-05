@@ -146,6 +146,9 @@ docker run -p 8000:8000 vehicle-classifier
 ```
 
 ### Cloud Testing
+
+### NOTE: The actual ALB url is mentioned inside the test_cloud.py file
+
 ```bash
 # Test live AWS ECS service
 python scripts/test_cloud.py "https://example.com/car-image.jpg"
@@ -202,6 +205,11 @@ with open("car_image.jpg", "rb") as f:
   "probabilities": [0.0123, 0.0234, 0.0345, 0.8945, 0.0353]
 }
 ```
+# Since, the AWS free tier ending mid of January, the ECS url may not work, hence adding a video of the deployment here
+
+## Video of the deployment:
+
+![AWS DEPLOYMENT](Screen_Recording_20260105_210443_Chrome_1.gif)
 
 ## Performance Metrics
 
