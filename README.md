@@ -4,6 +4,9 @@
 
 This project implements an end-to-end vehicle type classification system using deep learning. The system can automatically identify and classify vehicles into five categories: **hatchback**, **motorcycle**, **pickup**, **sedan**, and **suv** from images.
 
+### Problem Statement
+Automating vehicle type identification from images is essential for applications such as traffic management, parking systems, fleet monitoring, and security, where manual labeling is costly and error-prone. This project provides a practical solution: a lightweight MobileNetV2-based classifier trained on the VTID1 dataset with techniques to mitigate class imbalance and handle variable image conditions. The trained model is exported to ONNX for efficient CPU inference and served via a containerized FastAPI endpoint, allowing easy integration through the `POST /predict` API for real-world systems and workflows.
+
 ### Key Features
 - **High Accuracy**: Achieves 89.9% validation accuracy using MobileNetV2 architecture
 - **Production Ready**: Containerized FastAPI service deployed on AWS ECS
@@ -30,6 +33,8 @@ Vehicle-Type-Detection-Deep-Learning/
 │   ├── predict.py        # FastAPI prediction server
 │   ├── test_local.py     # Local testing script
 │   └── test_cloud.py     # Cloud deployment testing
+├── notebooks/
+│   └── vehicle_type_detection.ipynb  # End-to-end notebook: EDA, training, ONNX export, inference
 ├── test_images/          # Sample images for testing
 ├── Dockerfile           # Container configuration
 ├── requirements.txt     # Python dependencies
