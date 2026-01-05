@@ -209,7 +209,7 @@ with open("car_image.jpg", "rb") as f:
 
 ## Video of the deployment:
 
-<video src="Screen_Recording_20260105_210443_Chrome_1.mp4" controls></video>
+<video src="Screen_Recording_20260105_210443_Chrome_1.mp4" controls/>
 
 ## Performance Metrics
 
