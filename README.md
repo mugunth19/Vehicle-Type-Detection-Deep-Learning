@@ -209,7 +209,10 @@ with open("car_image.jpg", "rb") as f:
 
 ## Video of the deployment:
 
-<video src="Screen_Recording_20260105_210443_Chrome_1.mp4" controls></video>
+![AWS DEPLOYMENT](Screen_Recording_20260105_210443_Chrome_1.gif)
+
+or watch here -> https://github.com/mugunth19/Vehicle-Type-Detection-Deep-Learning/blob/main/Screen_Recording_20260105_210443_Chrome_1.mp4
+
 
 
 ## Performance Metrics
