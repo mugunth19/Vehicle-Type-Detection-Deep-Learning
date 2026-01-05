@@ -209,7 +209,8 @@ with open("car_image.jpg", "rb") as f:
 
 ## Video of the deployment:
 
-![AWS DEPLOYMENT](Screen_Recording_20260105_210443_Chrome_1.gif)
+
+<img src="Screen_Recording_20260105_210443_Chrome_1.gif" alt="AWS Deployment" width="100%">
 
 ## Performance Metrics
 
